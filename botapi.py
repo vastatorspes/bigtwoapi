@@ -8,6 +8,9 @@ Created on Tue May 28 02:07:31 2019
 from rulebaseAI import predictedMove
 from flask import Flask
 from flask_restful import Resource, Api
+from os import environ
+
+app.run(environ.get('PORT'))
 
 app = Flask(__name__)
 api = Api(app)
@@ -34,7 +37,7 @@ class RuleBased1(Resource):
     
 api.add_resource(RuleBased1, '/RuleBased1/<hand>+<field>+<control>+<int:turn>+<field_history>+<int:e1hand>+<int:e2hand>+<int:e3hand>+<pass_turn>')
 
-app.run()
+app.run(environ.get('PORT'))
 
 
 #hand = ['4H', '4D', '4S', '7D', '10C', '10S', 'QC', '2D', '2C']
