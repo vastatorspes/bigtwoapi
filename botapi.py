@@ -10,8 +10,6 @@ from flask import Flask
 from flask_restful import Resource, Api
 from os import environ
 
-app.run(environ.get('PORT'))
-
 app = Flask(__name__)
 api = Api(app)
 
