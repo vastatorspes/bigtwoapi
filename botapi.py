@@ -5,7 +5,6 @@ Created on Tue May 28 02:07:31 2019
 @author: Gerry
 """
 
-from simpleAI import randomAI
 from rulebaseAI import predictedMove
 from flask import Flask
 from flask_restful import Resource, Api
