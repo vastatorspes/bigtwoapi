@@ -35,4 +35,4 @@ class RuleBased1(Resource):
     
 api.add_resource(RuleBased1, '/RuleBased1/<hand>+<field>+<control>+<int:turn>+<field_history>+<int:e1hand>+<int:e2hand>+<int:e3hand>+<pass_turn>')
 
-app.run(environ.get('PORT'), host='0.0.0.0')
+app.run(host='0.0.0.0', port=environ.get('PORT'))
