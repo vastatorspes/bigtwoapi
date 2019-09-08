@@ -34,7 +34,7 @@ class RuleBased1(Resource):
     
 api.add_resource(RuleBased1, '/RuleBased1/<hand>+<field>+<control>+<int:turn>+<field_history>+<int:e1hand>+<int:e2hand>+<int:e3hand>+<pass_turn>')
 
-app.run(port=5000)
+app.run()
 
 
 #hand = ['4H', '4D', '4S', '7D', '10C', '10S', 'QC', '2D', '2C']
