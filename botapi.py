@@ -35,9 +35,4 @@ class RuleBased1(Resource):
     
 api.add_resource(RuleBased1, '/RuleBased1/<hand>+<field>+<control>+<int:turn>+<field_history>+<int:e1hand>+<int:e2hand>+<int:e3hand>+<pass_turn>')
 
-app.run(environ.get('PORT'))
-
-
-#hand = ['4H', '4D', '4S', '7D', '10C', '10S', 'QC', '2D', '2C']
-#field = ['3H', '3S', '3D', '5S', '5D']
-#predictedMove(hand, field, False, 1)
+app.run(environ.get('PORT'), host='0.0.0.0')
