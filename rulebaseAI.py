@@ -442,6 +442,7 @@ def cardClassifier(hand, field_history, min_hand):
 #field_history = ['4C', 'KD', '3H', '3D', '2C', 'AD', '8D', '5H', '10S', 'QS', '7D', 'AH', '5S', '8C', 'AS', '7C', 'KS', 'QD', '6H', '5C', '8H', 'QC', '3S', 'JC', 'KC', '4D', '7H', '6C', '6S', '4H', 'AC', '9S']
 #cardClassifier(hand, field_history)
 
+# Two cards left
 def twoCard(hand, classA, enemy1, enemy2, enemy3):
     # Check pair
     handPair = card.getPair(hand)
@@ -451,6 +452,7 @@ def twoCard(hand, classA, enemy1, enemy2, enemy3):
         return [hand[1]]
     return [hand[0]]
 
+# Three cards left
 def threeCard(hand, classA, classB, classC, classD, enemy1, enemy2, enemy3):
     # Check pair
     handPair = card.getPair(hand)
@@ -488,6 +490,7 @@ def threeCard(hand, classA, classB, classC, classD, enemy1, enemy2, enemy3):
             return [hand[0]]
         return [hand[0]]
 
+# Four cards left
 def fourCard(hand, classA, classB, classC, classD, enemy1, enemy2, enemy3):
     # Check pair
     handPair = card.getPair(hand)
@@ -529,6 +532,7 @@ def fourCard(hand, classA, classB, classC, classD, enemy1, enemy2, enemy3):
             return [hand[3]]
         return [hand[0]]
 
+# Cards left <= 4
 def underFour(hand, classA, classB, classC, classD, enemy1, enemy2, enemy3):
     if len(hand) == 2:
         return twoCard(hand, classA, enemy1, enemy2, enemy3)
@@ -537,6 +541,30 @@ def underFour(hand, classA, classB, classC, classD, enemy1, enemy2, enemy3):
     elif len(hand) == 4:
         return fourCard(hand, classA, classB, classC, classD, enemy1, enemy2, enemy3)
     return [hand[0]]
+
+# Cards left > 4
+def moreFour(hand, classA, classB, classC, classD, enemy1, enemy2, enemy3):
+    comboCard = findComboInClass(classD) + findComboInClass(classC) + findComboInClass(classB) + findComboInClass(classA)
+    pairCard = findPairInClass(classD) + findPairInClass(classC) + findPairInClass(classB) + findPairInClass(classA)
+    singleCard = findSingleInClass(classD) + findSingleInClass(classC) + findSingleInClass(classB) + findSingleInClass(classA)
+    if 1 in [enemy1, enemy2, enemy3]:
+        if comboCard:
+            return comboCard[0]
+        elif pairCard:
+            return pairCard[0]
+        else:
+            if classD: return classD[0]
+            if classC: return classC[0]
+            if classB: return classB[0]
+            if classA: return classA[0]
+    else:
+        if (not comboCard) and (len(pairCard) > len(singleCard)):
+            return pairCard[0]
+        else:
+            if classD: return classD[0]
+            if classC: return classC[0]
+            if classB: return classB[0]
+            if classA: return classA[0]
                 
 def checkHoldback(hand, field, enemy1, enemy2, enemy3, turn, pass_turn, classA, classB, classC, classD, selected_card):
     # Holdback Single
@@ -550,7 +578,6 @@ def checkHoldback(hand, field, enemy1, enemy2, enemy3, turn, pass_turn, classA, 
                 return True
         if min([len(hand), enemy1, enemy2, enemy3]) > 6:
             if selected_card == [hand[-1]]:
-#            if selected_card == [hand[-1]] and selected_card not in cardClass.get("classA"):
                 return True
     # Holdback Pair
     if len(field) == 2:
@@ -558,9 +585,6 @@ def checkHoldback(hand, field, enemy1, enemy2, enemy3, turn, pass_turn, classA, 
             return False
         if min([len(hand), enemy1, enemy2, enemy3]) > 2:
             if card.getPairScore(selected_card) >= 50:
-                return True
-        elif (len(hand) + enemy1 + enemy2 + enemy3) < 26 and min([len(hand), enemy1, enemy2, enemy3]) > 4:
-            if selected_card == highestPair(hand) and selected_card not in classA:
                 return True
     # Holdback Combo
     if len(field) == 5:
@@ -575,15 +599,6 @@ def checkHoldback(hand, field, enemy1, enemy2, enemy3, turn, pass_turn, classA, 
                 if len(tempCombo) > 0 and (selected_card in classA or selected_card in classB):
                     return True
     return False
-
-def highestPair(hand):
-    tempPair = card.getPair(hand)
-    scorePair = [card.getPairScore(pair) for pair in tempPair]
-    return tempPair[scorePair.index(max(scorePair))]
-
-#hand = ['4C','4S','JC','JH','KD','KH','AD','2H']
-#highestPair(hand)
-
 
 ## Test Holdback Single
 #hand = ['3D','4D','5H','6H','7C','8D','8H','8S','9C','JD','JH','KD','AS']
@@ -870,6 +885,7 @@ def splitMove(field, moveLists, comboCard, pairCard, singleCard, enemy1, enemy2,
                 return singleInCombo(comboCard, moveLists, enemy1, enemy2, enemy3)
             return []
 
+# Not control move for advance strategy
 def notControlMove(field, moveLists, comboCard, pairCard, singleCard, enemy1, enemy2, enemy3):
     # Field Combo
     if len(field) == 5:
@@ -916,29 +932,23 @@ def advanceStrategy(hand, field, moveLists, pass_turn, classA, classB, classC, c
     classDPair = findPairInClass(classD)
     classDCombo = findComboInClass(classD)
 
-    comboCard = classACombo + classBCombo + classCCombo + classDCombo
-    pairCard = classAPair + classBPair + classCPair + classDPair
-    singleCard = classASingle + classBSingle + classCSingle + classDSingle
+    comboCard = classDCombo + classCCombo + classBCombo + classACombo
+    pairCard = classDPair + classCPair + classBPair + classAPair
+    singleCard = classDSingle + classCSingle + classBSingle + classASingle
     
     if moveLen <= 2:
         if control:
             if len(classA) > 0:                                                 # classAnya lebih dari 1
-                for cards in classA:
-                    if cards in moveLists: return cards
+                return classA[0]
             else:
                 if comboCard:
-                    for cards in comboCard:
-                        if cards in moveLists: return cards
+                    return comboCard[0]
                 if pairCard:                                      # kalo gaada combo pasti ada poir
                     if 2 in [enemy1, enemy2, enemy3]:
-                        for cards in reversed(pairCard):
-                            if cards in moveLists: return cards
-                    else:
-                        for cards in pairCard:
-                            if cards in moveLists: return cards
+                        return pairCard[-1]
+                    return pairCard[0]
                 if singleCard:
-                    for cards in reversed(singleCard):
-                        if cards in moveLists: return cards
+                    return singleCard[-1]
                 return []
 
         if not control:
@@ -951,22 +961,16 @@ def advanceStrategy(hand, field, moveLists, pass_turn, classA, classB, classC, c
     if moveLen == 3:
         if control:
             if len(classA) > 1:                                                 # classAnya lebih dari 1
-                for cards in classA:
-                    if cards in moveLists: return cards
+                return classA[0]
             else:
                 if comboCard:
-                    for cards in comboCard:
-                        if cards in moveLists: return cards
+                    return comboCard[0]
                 if pairCard:                                      # kalo gaada combo pasti ada poir
                     if 2 in [enemy1, enemy2, enemy3]:
-                        for cards in reversed(pairCard):
-                            if cards in moveLists: return cards
-                    else:
-                        for cards in pairCard:
-                            if cards in moveLists: return cards
+                        return pairCard[-1]
+                    return pairCard[0]
                 if singleCard:
-                    for cards in reversed(singleCard):
-                        if cards in moveLists: return cards
+                    return singleCard[-1]
                 return []
 
         if not control:
@@ -1011,11 +1015,9 @@ def moveSelection(hand, field, turn, pass_turn, classA, classB, classC, classD, 
         if len(hand) <= 4:
             selected_card = underFour(hand, classA, classB, classC, classD, enemy1, enemy2, enemy3)
             return selected_card
-        elif len(hand) > 4:
-            if classD: return classD[0]
-            if classC: return classC[0]
-            if classB: return classB[0]
-            if classA: return classA[0]
+        else:
+            selected_card = moreFour(hand, classA, classB, classC, classD, enemy1, enemy2, enemy3)
+            return selected_card
 
     if not control:
         classA = [x for x in classA if x in moveLists]
@@ -1040,21 +1042,9 @@ def moveSelection(hand, field, turn, pass_turn, classA, classB, classC, classD, 
                 if not checkHoldback(hand, field, enemy1, enemy2, enemy3, turn, pass_turn, tempClassA, tempClassB, tempClassC, tempClassD, selected_card):
                     return selected_card
         if 1 in [enemy1, enemy2, enemy3]:
-            classASingle = findSingleInClass(classA)
-            classAPair = findPairInClass(classA)
-            classACombo = findComboInClass(classA)
-            classBSingle = findSingleInClass(classB)
-            classBPair = findPairInClass(classB)
-            classBCombo = findComboInClass(classB)
-            classCSingle = findSingleInClass(classC)
-            classCPair = findPairInClass(classC)
-            classCCombo = findComboInClass(classC)
-            classDSingle = findSingleInClass(classD)
-            classDPair = findPairInClass(classD)
-            classDCombo = findComboInClass(classD)
-            comboCard = classACombo + classBCombo + classCCombo + classDCombo
-            pairCard = classAPair + classBPair + classCPair + classDPair
-            singleCard = classASingle + classBSingle + classCSingle + classDSingle
+            comboCard = findComboInClass(classD) + findComboInClass(classC) + findComboInClass(classB) + findComboInClass(classA)
+            pairCard = findPairInClass(classD) + findPairInClass(classC) + findPairInClass(classB) + findPairInClass(classA)
+            singleCard = findSingleInClass(classD) + findSingleInClass(classC) + findSingleInClass(classB) + findSingleInClass(classA)
             return splitMove(field, moveLists, comboCard, pairCard, singleCard, enemy1, enemy2, enemy3)
         return []
 
@@ -1214,6 +1204,18 @@ def predictedMove(hand, field, control, turn, field_history, enemy1, enemy2, ene
 
 #allcards = [d['name'] for d in card.card]
 #list(set(allcards).difference(set(['4D','4S','6D','2D'])))
+
+## Test move selection
+#hand = ['3C','4D', '8D', 'JD', 'QD', 'QC', 'KD', '2D']
+#field = []
+#control = True
+#field_history = ['3D', '3H', '5C', '5S', '6S', '8C', '9S', '10D', 'JC', 'KS', 'AH', 'AS', '2S', '6D', '6C', '10C', '10H', 'AD', 'AC', '5D', '5H', '9C', '9H', '7D', '7C', '4C', '4S', '6H', '7S', '10S', 'JS', 'QS', '2C', '7H', '8H', 'JH', 'QH', '2H', '9D', 'KH']
+#turn = 58
+#enemy1 = 1
+#enemy2 = 1
+#enemy3 = 2
+#pass_turn = {0:0, 1:0, 2:0, 3:0}
+#predictedMove(hand, field, control, turn, field_history, enemy1, enemy2, enemy3, pass_turn)
 
 ## Test pair
 #hand = ['6C','7S','8C','9D','9H','9S','10H','2D','2H','2S']
