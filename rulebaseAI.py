@@ -543,7 +543,7 @@ def underFour(hand, classA, classB, classC, classD, enemy1, enemy2, enemy3):
     return [hand[0]]
 
 # Cards left > 4
-def moreFour(hand, classA, classB, classC, classD, enemy1, enemy2, enemy3):
+def overFour(hand, classA, classB, classC, classD, enemy1, enemy2, enemy3):
     comboCard = findComboInClass(classD) + findComboInClass(classC) + findComboInClass(classB) + findComboInClass(classA)
     pairCard = findPairInClass(classD) + findPairInClass(classC) + findPairInClass(classB) + findPairInClass(classA)
     singleCard = findSingleInClass(classD) + findSingleInClass(classC) + findSingleInClass(classB) + findSingleInClass(classA)
@@ -1016,10 +1016,19 @@ def moveSelection(hand, field, turn, pass_turn, classA, classB, classC, classD, 
             selected_card = underFour(hand, classA, classB, classC, classD, enemy1, enemy2, enemy3)
             return selected_card
         else:
-            selected_card = moreFour(hand, classA, classB, classC, classD, enemy1, enemy2, enemy3)
+            selected_card = overFour(hand, classA, classB, classC, classD, enemy1, enemy2, enemy3)
             return selected_card
 
     if not control:
+        # Field single
+        if len(field) == 1:
+            # Split bigPair
+            bigPair = findPairInClass(classA)
+            if bigPair:
+                bigSingle = bigPair[-1]
+                classA.append([bigSingle[0]])
+                classA.append([bigSingle[1]])
+        
         classA = [x for x in classA if x in moveLists]
         classB = [x for x in classB if x in moveLists]
         classC = [x for x in classC if x in moveLists]
@@ -1194,7 +1203,6 @@ def predictedMove(hand, field, control, turn, field_history, enemy1, enemy2, ene
     classC = splitTrisToSingleAndPair(filterClassC)
     classD = splitTrisToSingleAndPair(filterClassD)
     
-    
     print(' Class A \n', classA)
     print(' Class B \n', classB)
     print(' Class C \n', classC)
@@ -1205,17 +1213,6 @@ def predictedMove(hand, field, control, turn, field_history, enemy1, enemy2, ene
 #allcards = [d['name'] for d in card.card]
 #list(set(allcards).difference(set(['4D','4S','6D','2D'])))
 
-## Test move selection
-#hand = ['3C','4D', '8D', 'JD', 'QD', 'QC', 'KD', '2D']
-#field = []
-#control = True
-#field_history = ['3D', '3H', '5C', '5S', '6S', '8C', '9S', '10D', 'JC', 'KS', 'AH', 'AS', '2S', '6D', '6C', '10C', '10H', 'AD', 'AC', '5D', '5H', '9C', '9H', '7D', '7C', '4C', '4S', '6H', '7S', '10S', 'JS', 'QS', '2C', '7H', '8H', 'JH', 'QH', '2H', '9D', 'KH']
-#turn = 58
-#enemy1 = 1
-#enemy2 = 1
-#enemy3 = 2
-#pass_turn = {0:0, 1:0, 2:0, 3:0}
-#predictedMove(hand, field, control, turn, field_history, enemy1, enemy2, enemy3, pass_turn)
 
 ## Test pair
 #hand = ['6C','7S','8C','9D','9H','9S','10H','2D','2H','2S']
