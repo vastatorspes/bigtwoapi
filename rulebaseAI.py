@@ -569,7 +569,7 @@ def overFour(hand, classA, classB, classC, classD, enemy1, enemy2, enemy3):
 def checkHoldback(hand, field, enemy1, enemy2, enemy3, turn, pass_turn, classA, classB, classC, classD, selected_card):
     # Holdback Single
     if len(field) == 1:
-        if len(hand) == 1:
+        if len(hand) <= 2:
             return False
         if min(enemy1, enemy2, enemy3) <= 2 and selected_card == [hand[-1]]:
             return False
@@ -581,7 +581,7 @@ def checkHoldback(hand, field, enemy1, enemy2, enemy3, turn, pass_turn, classA, 
                 return True
     # Holdback Pair
     if len(field) == 2:
-        if len(hand) == 2:
+        if len(hand) <= 3:
             return False
         if min([len(hand), enemy1, enemy2, enemy3]) > 2:
             if card.getPairScore(selected_card) >= 50:
